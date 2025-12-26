@@ -48,7 +48,17 @@ def load_images(image_files):
     return out
 
 
-def inference_model(image_files, query, model, tokenizer, image_processor, context_len, conv_mode, temperature=0, max_new_tokens=100):
+def inference_model(
+    image_files,
+    query,
+    model,
+    tokenizer,
+    image_processor,
+    context_len,
+    conv_mode,
+    temperature=0,
+    max_new_tokens=100,
+):
     qs = query
     image_token_se = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN
     if IMAGE_PLACEHOLDER in qs:
@@ -68,11 +78,10 @@ def inference_model(image_files, query, model, tokenizer, image_processor, conte
     prompt = conv.get_prompt()
 
     images = load_images(image_files)
-    images_tensor = process_images(
-        images,
-        image_processor,
-        model.config
-    ).to(model.device, dtype=torch.float16 if "cuda" in str(model.device) else torch.float32)
+    images_tensor = process_images(images, image_processor, model.config).to(
+        model.device,
+        dtype=torch.float16 if "cuda" in str(model.device) else torch.float32,
+    )
 
     input_ids = (
         tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
@@ -98,16 +107,13 @@ def inference_model(image_files, query, model, tokenizer, image_processor, conte
             stopping_criteria=[stopping_criteria],
         )
 
-    outputs = tokenizer.batch_decode(
-        output_ids, skip_special_tokens=True
-    )[0]
+    outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
     outputs = outputs.strip()
     if outputs.endswith(stop_str):
         outputs = outputs[: -len(stop_str)]
     outputs = outputs.strip()
     print(outputs)
     return outputs
-
 
 
 if __name__ == "__main__":

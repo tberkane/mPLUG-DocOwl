@@ -17,7 +17,7 @@ def main():
     output_json = sys.argv[2]
 
     # Build the model
-    model_path = "./TinyChart-3B-768"
+    model_path = "mPLUG/TinyChart-3B-768"
     tokenizer, model, image_processor, context_len = load_pretrained_model(
         model_path,
         model_base=None,
